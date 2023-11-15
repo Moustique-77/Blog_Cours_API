@@ -1,0 +1,49 @@
+User : idUser, email, mdp, nom, prénom
+Article : idArticle, titre, contenu, auteur, date de création
+Ecritpar : idArticle, idUser
+ 
+
+
+ CREATE USER userblog@localhost identified by userblog;
+ GRANT ALL PRIVILEGES on blog.* to userblog@localhost ;
+
+mysql -u userblog -p 
+
+CREATE DATABSE blog;
+use blog
+
+
+CREATE TABLE Utilisateurs (
+  idUser INT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(255),
+  mdp VARCHAR(255),
+  nom VARCHAR(255),
+  prenom VARCHAR(255)
+);
+
+CREATE TABLE Articles (
+  idArticle INT AUTO_INCREMENT PRIMARY KEY,
+  titre VARCHAR(255) NOT NULL,
+  contenu TEXT NOT NULL,
+  auteur VARCHAR(255) NOT NULL,
+  dateCreation DATE NOT NULL
+);
+
+CREATE TABLE EcritPar (
+  idArticle INT,
+  idUser INT,
+  PRIMARY KEY (idArticle, idUser),
+  FOREIGN KEY (idArticle) REFERENCES Articles(idArticle) ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY (idUser) REFERENCES Utilisateurs(idUser) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS EcritPar;
+DROP TABLE IF EXISTS Articles;
+DROP TABLE IF EXISTS Utilisateurs;
+
+ {
+        "titre": "michel",
+        "contenu": "michel",
+        "date":"06-17-2022",
+        "id_utilisateur":"1"
+    }

@@ -1,0 +1,42 @@
+html, body{
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  width: 100%;
+}
+
+.App {
+  text-align: center;
+}
+
+/* header Styles */
+header {
+  background-color: #bc4c49;
+  color: #ffffff; /* White text color */
+  padding: 15px 0; /* Vertical padding */
+  position: relative;
+  bottom: 0;
+  width: stretch;
+  left: 0;
+  position: top;
+}
+
+.header-items{
+  display: flex;
+  justify-content : space-evenly;
+}
+
+.header-connexion{
+  display: flex;
+  align-items: center;
+}
+
+/* footer Styles */
+footer {
+  color: #000000; /* White text color */
+  padding: 30px 0; /* Vertical padding */
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  left: 0;
+}
