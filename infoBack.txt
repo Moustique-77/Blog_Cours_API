@@ -20,14 +20,14 @@ CREATE TABLE Utilisateurs (
   nom VARCHAR(255),
   prenom VARCHAR(255)
 );
-
 CREATE TABLE Articles (
-  idArticle INT AUTO_INCREMENT PRIMARY KEY,
-  titre VARCHAR(255) NOT NULL,
-  contenu TEXT NOT NULL,
-  auteur VARCHAR(255) NOT NULL,
-  dateCreation DATE NOT NULL
+    idArticle INT AUTO_INCREMENT PRIMARY KEY,
+    titre VARCHAR(255) NOT NULL,
+    contenu TEXT NOT NULL,
+    auteur VARCHAR(255) NOT NULL,
+    dateCreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 CREATE TABLE EcritPar (
   idArticle INT,
@@ -40,6 +40,11 @@ CREATE TABLE EcritPar (
 DROP TABLE IF EXISTS EcritPar;
 DROP TABLE IF EXISTS Articles;
 DROP TABLE IF EXISTS Utilisateurs;
+
+
+ALTER TABLE Articles MODIFY COLUMN dateCreation  TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+
 
  {
         "titre": "michel",

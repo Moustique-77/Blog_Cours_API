@@ -62,6 +62,10 @@ function AuthForm() {
       const data = await response.json();
       if (data.success) {
         setSubmitStatus({ success: true, message: 'Connexion réussie !' });
+
+        localStorage.setItem('user', JSON.stringify(data.user));
+        console.log(localStorage.getItem('user'));
+
         navigate('/home');
       } else {
         setSubmitStatus({ success: false, message: data.message });

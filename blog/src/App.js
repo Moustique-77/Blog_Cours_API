@@ -6,6 +6,7 @@ import Footer from './components/Footer.js';
 import Connexion from './components/DashBoard/AuthFrom.js';
 import Home from './components/Blog/Home.js';
 import ArticleForm from './components/Blog/ArticleForm.js';
+import Disconnect from './components/DashBoard/Disconnect.js';
 
 import './App.css';
 
@@ -17,7 +18,8 @@ function App() {
       <Routes>
           <Route path="/" element={<Home/>} />
           <Route path="/connexion" element={<Connexion/>} />
-          <Route path="/article" element={<ArticleForm/>} />
+          <Route path="/disconnect" element={<Disconnect/>} />
+          <Route path="/Blog/ArticleForm" element={<ArticleForm/>} />
       </Routes>
 
       <Footer />

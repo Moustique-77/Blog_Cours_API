@@ -1,26 +1,63 @@
 import React, { useState } from 'react';
-import { TextField, Button, Container, Typography, Grid } from '@mui/material';
+import { TextField, Button, Container, Typography, Grid, Alert } from '@mui/material';
 
 const ArticleForm = ({ onSubmit }) => {
+
+  //Load the user id from the local storage
+  const userNom = localStorage.getItem('user');
+
+  //Transfor userId to JSON
+  const userNomJson = JSON.parse(userNom);
+
+  //Get the id from the JSON
+  const userNomFinal = userNomJson['nom'];
+
   const [formData, setFormData] = useState({
     titre: '',
     contenu: '',
-    date: '',
-    id_utilisateur: '',
+    userNom: userNomFinal, 
+  });
+  const [submitStatus, setSubmitStatus] = useState({
+    success: false,
+    message: '',
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleCreateArticle = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/articles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          titre: formData.titre,
+          contenu: formData.contenu,
+          userNom: formData.userNom,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSubmitStatus({ success: true, message: 'Article créé' });
+        onSubmit(formData); 
+      } else {
+        setSubmitStatus({ success: false, message: 'Erreur lors de la création de l\'article' });
+      }
+    } catch (err) {
+      console.log(err);
+      setSubmitStatus({ success: false, message: 'Erreur lors de la création de l\'article' });
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Pass the form data to the parent component for submission
-    onSubmit(formData);
+    handleCreateArticle();
   };
 
   return (
@@ -56,34 +93,6 @@ const ArticleForm = ({ onSubmit }) => {
               onChange={handleChange}
             />
           </Grid>
-          <Grid item xs={12}>
-            <TextField
-              variant="outlined"
-              required
-              fullWidth
-              id="date"
-              label="Date"
-              name="date"
-              type="date"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              value={formData.date}
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              variant="outlined"
-              required
-              fullWidth
-              id="id_utilisateur"
-              label="ID Utilisateur"
-              name="id_utilisateur"
-              value={formData.id_utilisateur}
-              onChange={handleChange}
-            />
-          </Grid>
         </Grid>
         <Button
           type="submit"
@@ -95,6 +104,12 @@ const ArticleForm = ({ onSubmit }) => {
           Créer l'article
         </Button>
       </form>
+          {/* Afficher un message de statut après la soumission */}
+          {submitStatus.message && (
+        <Alert severity={submitStatus.success ? 'success' : 'error'}>
+          {submitStatus.message}
+        </Alert>
+      )}
     </Container>
   );
 };

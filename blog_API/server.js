@@ -66,15 +66,23 @@ app.post('/api/login', async (req, res) => {
         const rows = await conn.query("SELECT * FROM Utilisateurs WHERE email = ?", [email]);
 
         if (rows.length === 1) {
-            const storedPasswordHash = rows[0].mdp; // Fetching the hash from the database
+            const storedPasswordHash = rows[0].mdp; // Récupération du hash du mot de passe depuis la base de données
 
-            // Comparing the provided password with the stored hash
+            // Comparaison du mot de passe fourni avec le hash stocké
             const passwordMatch = await bcrypt.compare(password, storedPasswordHash);
 
             if (passwordMatch) {
+                // Renvoi des données utilisateur sans inclure le hash du mot de passe
+                const user = rows[0];
                 res.json({
                     success: true,
-                    message: 'User logged in successfully'
+                    message: 'User logged in successfully',
+                    user: {
+                        id: user.idUser,
+                        email: user.email,
+                        nom: user.nom,
+                        prenom: user.prenom
+                    }
                 });
             } else {
                 res.json({
@@ -90,83 +98,91 @@ app.post('/api/login', async (req, res) => {
         }
     } catch (err) {
         console.error(err);
+        res.status(500).json({
+            success: false,
+            message: 'Error during the login process'
+        });
     } finally {
         if (conn) { 
+            conn.release();
+        }
+    }
+});
+
+
+// ROUTE FOR CREATE A NEW ARTICLE
+app.post('/api/articles', async (req, res) => {
+    const conn = await pool.getConnection();
+
+    try {
+        let titre = req.body.titre;
+        let contenu = req.body.contenu;
+        let nom = req.body.userNom;
+
+        console.log(req.body);
+
+        // Ensure that all required fields are provided
+        if (!titre || !contenu || !nom) {
+            return res.status(400).json({
+                success: false,
+                message: 'All fields (titre, contenu, nom) are required'
+            });
+        }
+
+        const result = await conn.query("INSERT INTO Articles(titre, contenu, auteur) VALUES(?, ?, ?)", [titre, contenu, nom]);
+
+
+        if (result.affectedRows === 1) {
+            res.status(201).json({
+                success: true,
+                message: 'Article created successfully'
+            });
+        } else {
+            res.status(500).json({
+                success: false,
+                message: 'Error creating the article'
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: 'catch error creating the article'
+        });
+    } finally {
+        if (conn) {
             conn.release(); // Release the connection regardless of the outcome
         }
     }
-
 });
 
-// // ROUTE FOR CREATE A NEW ARTICLE
-// app.post('/api/articles', async (req, res) => {
-//     const conn = await pool.getConnection();
 
-//     try {
-//         let titre = req.body.titre;
-//         let contenu = req.body.contenu;
-//         let date = req.body.date;
-//         let id_utilisateur = req.body.id_utilisateur;
+// ROUTE FOR GET ALL ARTICLES
+app.get('/api/articles', async (req, res) => {
+    const conn = await pool.getConnection();
 
-//         // Ensure that all required fields are provided
-//         if (!titre || !contenu || !date || !id_utilisateur) {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: 'All fields (titre, contenu, date, id_utilisateur) are required'
-//             });
-//         }
+    try {
+        // Fetch all articles from the database
+        const articles = await conn.query("SELECT * FROM Articles");
 
-//         const result = await conn.query("INSERT INTO Articles(titre, contenu, dateCreation, id_utilisateur) VALUES(?, ?, ?, ?)", [titre, contenu, date, id_utilisateur]);
-//         if (result.affectedRows === 1) {
-//             res.status(201).json({
-//                 success: true,
-//                 message: 'Article created successfully'
-//             });
-//         } else {
-//             res.status(500).json({
-//                 success: false,
-//                 message: 'Error creating the article'
-//             });
-//         }
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({
-//             success: false,
-//             message: 'Error creating the article'
-//         });
-//     } finally {
-//         if (conn) {
-//             conn.release(); // Release the connection regardless of the outcome
-//         }
-//     }
-// });
-
-// // ROUTE FOR GET ALL ARTICLES
-// app.get('/api/articles', async (req, res) => {
-//     const conn = await pool.getConnection();
-
-//     try {
-//         // Fetch all articles from the database
-//         const articles = await conn.query("SELECT * FROM Articles");
-
-//         // Send the articles as a JSON response
-//         res.status(200).json({
-//             success: true,
-//             articles: articles,
-//             message: 'All articles retrieved successfully'
-//         });
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({
-//             success: false,
-//             message: 'Error fetching articles from the database'
-//         });
-//     } finally {
-//         if (conn) {
-//             conn.release(); // Release the connection regardless of the outcome
-//         }
-//     }
-// });
+        // Send the articles as a JSON response
+        res.status(200).json({
+            success: true,
+            articles: articles,
+            message: 'All articles retrieved successfully'
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching articles from the database'
+        });
+    } finally {
+        if (conn) {
+            conn.release(); // Release the connection regardless of the outcome
+        }
+    }
+});
 
 // // GET ALL ARTICLES BY USER ID
 // app.get('/api/articles/user/:userId', async (req, res) => {
