@@ -36,11 +36,7 @@ app.post('/api/register', async (req, res) => {
 
         const hash = await bcrypt.hash(password, bcrypt.genSaltSync(10));
 
-        console.log(hash);
-
         let rows = await conn.query("INSERT INTO Utilisateurs(email, mdp, nom, prenom) VALUES(?, ?, ?, ?)", [email, hash, nom, prenom]);
-
-        console.log(rows);
 
         res.status(200).json(rows.affectedRows);
     } catch (err) {
@@ -56,6 +52,7 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
+// Route for user login
 app.post('/api/login', async (req, res) => {
     const conn = await pool.getConnection();
     
@@ -109,7 +106,6 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-
 // ROUTE FOR CREATE A NEW ARTICLE
 app.post('/api/articles', async (req, res) => {
     const conn = await pool.getConnection();
@@ -118,8 +114,6 @@ app.post('/api/articles', async (req, res) => {
         let titre = req.body.titre;
         let contenu = req.body.contenu;
         let nom = req.body.userNom;
-
-        console.log(req.body);
 
         // Ensure that all required fields are provided
         if (!titre || !contenu || !nom) {
@@ -156,7 +150,6 @@ app.post('/api/articles', async (req, res) => {
     }
 });
 
-
 // ROUTE FOR GET ALL ARTICLES
 app.get('/api/articles', async (req, res) => {
     const conn = await pool.getConnection();
@@ -164,7 +157,7 @@ app.get('/api/articles', async (req, res) => {
     try {
         // Fetch specific columns for all articles from the database
         const articles = await conn.query("SELECT idArticle, titre, contenu, auteur, dateCreation FROM Articles");
-        console.log(articles);
+
         // Send the articles as a JSON response
         res.status(200).json({
             success: true,
@@ -220,8 +213,44 @@ app.get('/api/articles/user/:userName', async (req, res) => {
     }
 });
 
+// GET AN ARTICLE BY ID
+app.get('/api/articles/:articleId', async (req, res) => {
+    const conn = await pool.getConnection();
+
+    try {
+        const articleId = req.params.articleId;
+
+        // Fetch the article from the database
+        const article = await conn.query("SELECT * FROM Articles WHERE idArticle = ?", [articleId]);
+
+        // Check if article exists and send the response accordingly
+        if (article && article.length > 0) {
+            res.status(200).json({
+                success: true,
+                article: article[0],
+                message: 'Article retrieved successfully'
+            });
+        } else {
+            res.status(404).json({
+                success: false,
+                message: 'Article not found'
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching article from the database'
+        });
+    } finally {
+        if (conn) {
+            conn.release(); // Release the connection regardless of the outcome
+        }
+    }
+});
+
 // UPDATE AN ARTICLE
-app.put('/api/articles/:articleId', async (req, res) => {
+app.put('/api/articles/update/:articleId', async (req, res) => {
     const conn = await pool.getConnection();
 
     try {
@@ -263,8 +292,43 @@ app.put('/api/articles/:articleId', async (req, res) => {
     }
 });
 
+// DELETE AN ARTICLE
+app.delete('/api/articles/delete/:id', async (req, res) => {
+    const { id } = req.params;
 
+    try {
+        const conn = await pool.getConnection();
 
+        const result = await conn.query('DELETE FROM Articles WHERE idArticle = ?', [id]);
 
+        if (result.affectedRows === 0) {
+            res.status(404).json({ success: false, message: "Article non trouvé" });
+        } else {
+            res.json({ success: true, message: "Article supprimé avec succès" });
+        }
+
+        conn.release();
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Erreur lors de la suppression de l'article" });
+    }
+});
+
+//SEARCH AN ARTICLE
+app.get('/api/blog/search', async (req, res) => {
+    const { term } = req.query; // Terme de recherche
+
+    try {
+        const conn = await pool.getConnection();
+        const query = "SELECT * FROM articles WHERE titre LIKE ? OR auteur LIKE ?";
+        const articles = await conn.query(query, [`%${term}%`, `%${term}%`]);
+
+        res.json({ success: true, articles: articles });
+        conn.release();
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Erreur interne du serveur" });
+    }
+});
 
 app.listen(3001, () => console.log('Server running on port 3001'));  // set the port to listen

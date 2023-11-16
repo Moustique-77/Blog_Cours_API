@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Container, Typography, Grid, Alert } from '@mui/material';
 
-const ArticleForm = ({ onSubmit }) => {
+const ArticleForm = () => {
 
   //Load the user id from the local storage
   const userNom = localStorage.getItem('user');
@@ -45,7 +45,6 @@ const ArticleForm = ({ onSubmit }) => {
 
       if (data.success) {
         setSubmitStatus({ success: true, message: 'Article créé' });
-        onSubmit(formData); 
       } else {
         setSubmitStatus({ success: false, message: 'Erreur lors de la création de l\'article' });
       }

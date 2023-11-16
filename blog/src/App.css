@@ -40,3 +40,77 @@ footer {
   width: 100%;
   left: 0;
 }
+
+/* UserArticles.css */
+.article-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+/* Ajoutez ces styles à votre fichier CSS */
+
+/* Style général pour la page */
+.container {
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 800px;
+}
+
+/* Style pour chaque article de la liste */
+.article-list li {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  padding: 20px;
+  background-color: rgb(213, 202, 202);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+}
+
+
+/* Style pour le titre de l'article */
+.article-list h6 {
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 35px;
+  font-weight: bold; /* Mettez le texte en gras */
+
+}
+
+.article-list h4 {
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 20px;
+}
+
+/* Style pour le contenu de l'article */
+.article-list body2 {
+  color: #666;
+  font-size: 30px;
+}
+
+/* Style pour les informations supplémentaires (auteur, date) */
+.article-list caption {
+  color: #999;
+  font-size: 30px;
+}
+
+/* Style pour les boutons d'action */
+.article-list button {
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+/* Style pour les informations de l'article */
+.article-list .article-info {
+  margin-bottom: 10px;
+}
+
+/* Style pour aligner les boutons côte à côte */
+.article-list .button-container {
+  display: center;
+  
+  
+  gap: 10px; /* Espacement entre les boutons */
+}

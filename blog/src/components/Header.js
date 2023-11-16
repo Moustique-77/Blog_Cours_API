@@ -14,7 +14,7 @@ function header() {
 
           <Link className='header-home' to="/">MyBlog</Link>
 
-          <Link className="header-ArticlesForm" to="/Blog/ArticleForm">Créer</Link>
+          <Link className="header-ArticlesForm" to="/Blog/ArticleForm">Écrire un article</Link>
 
           <Link className="header-connexion" to="/Blog/MyArticle">Mes articles</Link>
 
