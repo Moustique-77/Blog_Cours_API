@@ -66,7 +66,7 @@ function AuthForm() {
         localStorage.setItem('user', JSON.stringify(data.user));
         console.log(localStorage.getItem('user'));
 
-        navigate('/home');
+        navigate('/');
       } else {
         setSubmitStatus({ success: false, message: data.message });
       }
