@@ -1,4 +1,5 @@
 import React from 'react'
+import ArticleDisplay from './ArticleDisplay'
 
 function Home() {
 
@@ -11,6 +12,7 @@ function Home() {
       <h1>Dernière publication</h1>
 
       {/* Display all article with mapping */}
+      <ArticleDisplay />
 
     </div>
   )

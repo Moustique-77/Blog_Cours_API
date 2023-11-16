@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Typography } from '@mui/material';
 
-const ArticleDisplay = () => {
+const UserArticles = () => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+ //Load the user id from the local storage
+ const userNom = localStorage.getItem('user');
+
+ //Transfor userId to JSON
+ const userNomJson = JSON.parse(userNom);
+
+ //Get the id from the JSON
+ const userNomFinal = userNomJson['nom'];
 
   useEffect(() => {
-    const fetchArticles = async () => {
+    const fetchUserArticles = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/articles');
+        const response = await fetch(`http://localhost:3001/api/articles/user/${userNomFinal}`);
         const data = await response.json();
 
         if (data.success) {
@@ -18,18 +26,18 @@ const ArticleDisplay = () => {
           console.error(data.message);
         }
       } catch (error) {
-        console.error('Error fetching articles:', error);
+        console.error('Error fetching user articles:', error);
         setLoading(false);
       }
     };
 
-    fetchArticles();
-  }, []);
+    fetchUserArticles();
+  }, [userNomFinal]);
 
   return (
     <Container>
       <Typography variant="h4" sx={{ mt: 2 }}>
-        Liste des Articles
+        Articles de l'utilisateur
       </Typography>
 
       {loading ? (
@@ -51,4 +59,4 @@ const ArticleDisplay = () => {
   );
 };
 
-export default ArticleDisplay;
+export default UserArticles;

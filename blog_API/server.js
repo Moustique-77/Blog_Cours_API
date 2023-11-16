@@ -162,9 +162,9 @@ app.get('/api/articles', async (req, res) => {
     const conn = await pool.getConnection();
 
     try {
-        // Fetch all articles from the database
-        const articles = await conn.query("SELECT * FROM Articles");
-
+        // Fetch specific columns for all articles from the database
+        const articles = await conn.query("SELECT idArticle, titre, contenu, auteur, dateCreation FROM Articles");
+        console.log(articles);
         // Send the articles as a JSON response
         res.status(200).json({
             success: true,
@@ -184,36 +184,84 @@ app.get('/api/articles', async (req, res) => {
     }
 });
 
-// // GET ALL ARTICLES BY USER ID
-// app.get('/api/articles/user/:userId', async (req, res) => {
-//     const conn = await pool.getConnection();
+// GET ALL ARTICLES BY USER NAME
+app.get('/api/articles/user/:userName', async (req, res) => {
+    const conn = await pool.getConnection();
 
-//     try {
-//         const userId = req.params.userId;
+    try {
+        const userName = req.params.userName;
 
-//         // Fetch all articles associated with the specified user ID from the database
-//         const articles = await conn.query("SELECT * FROM Articles WHERE id_utilisateur = ?", [userId]);
+        // Fetch all articles associated with the specified user name from the database
+        const articles = await conn.query("SELECT * FROM Articles WHERE auteur = ?", [userName]);
 
-//         // Send the articles as a JSON response
-//         res.status(200).json({
-//             success: true,
-//             articles: articles,
-//             message: 'Articles retrieved successfully for the user'
-//         });
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({
-//             success: false,
-//             message: 'Error fetching articles for the user from the database'
-//         });
-//     } finally {
-//         if (conn) {
-//             conn.release(); // Release the connection regardless of the outcome
-//         }
-//     }
-// });
+        // Check if articles exist and send the response accordingly
+        if (articles && articles.length > 0) {
+            res.status(200).json({
+                success: true,
+                articles: articles,
+                message: 'Articles retrieved successfully for the user'
+            });
+        } else {
+            res.status(404).json({
+                success: false,
+                message: 'No articles found for the user'
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching articles for the user from the database'
+        });
+    } finally {
+        if (conn) {
+            conn.release(); // Release the connection regardless of the outcome
+        }
+    }
+});
 
+// UPDATE AN ARTICLE
+app.put('/api/articles/:articleId', async (req, res) => {
+    const conn = await pool.getConnection();
 
+    try {
+        const articleId = req.params.articleId;
+        const { titre, contenu } = req.body;
+
+        // Check if required fields are provided
+        if (!titre || !contenu) {
+            return res.status(400).json({
+                success: false,
+                message: 'Title and content are required for the update'
+            });
+        }
+
+        // Update the article in the database
+        const result = await conn.query("UPDATE Articles SET titre = ?, contenu = ? WHERE idArticle = ?", [titre, contenu, articleId]);
+
+        if (result.affectedRows === 1) {
+            res.status(200).json({
+                success: true,
+                message: 'Article updated successfully'
+            });
+        } else {
+            res.status(404).json({
+                success: false,
+                message: 'Article not found or no changes made'
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating the article'
+        });
+    } finally {
+        if (conn) {
+            conn.release(); // Release the connection regardless of the outcome
+        }
+    }
+});
 
 
 
